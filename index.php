@@ -39,13 +39,137 @@ function init_admin_content(){
     // $content.='</div>';
     echo $content;
 }
+function content_por_pais( $atts ){
+    $pais =  $atts['pais'];
+    $disciplina_id =  $atts['disciplina_id'];
+    
+    devtzal_enqueue_script();
+    wp_register_script('main_pais', plugins_url('/assets/main_pais.js?time='.rand(),__FILE__ ), [], '', true);
+    wp_enqueue_script('main_pais');
+    
+    $content='';
+    $types = get_post_types( [], 'objects' );
+    
+    $content.='
+        <div class="row justify-content-end">
+            
+            <div class="col-12 col-sm-3">
+              <div class="row">
+                <button type="button" id="nice-busqueda" class="btn btn-outline-primary text-left mb-3 col-12 toggle-filters">
+                  Búsqueda
+                  <img src="'.plugins_url('/assets/arrow-down-sign-to-navigate.png',__FILE__).'" width="1em" class="d-sm-none"/>
+                </button>
+              </div>
+              <div class="row" id="filters-container">        
+                <div class="position-fixed_ col-12">
+                    <button type="button" id="deleted-filters" class="btn btn-primary">Eliminar Filtros</button>
+                    <div>
+                      <span id="nice-tipo-estudios">Tipo de estudios</span>
+                      <select class="form-select" id="select-tipo-studios">
+                        <option value="0"><span id="nice-tipo-estudios">Tipo de estudios...</span></option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <hr class="my-4"/>
+                      <span id="nice-tipo-disciplinas">Disciplinas</span>
+                      <div class="spinner-border spinner-border-sm" id="loader-disciplinas" role="status"></div>
+                      <select class="form-select" id="select-disciplinas" style="display:none;">
+                        <option value="0" ><span id="nice-disciplinas">Disciplinas...</span></option>
+                      </select>
+                    </div>
+                    
+                    <div  id="container-subdisciplina">
+                      <hr class="my-4 hr" style="display:none;"/>
+                      <span id="nice-tipo-subdisciplina"></span>
+                      <div class="spinner-border spinner-border-sm" id="loader-subdisciplina" role="status" style="display:none;"></div>
+                      <select class="form-select" id="select-subdisciplina" style="display:none;">
+                        <option ><span id="nice-subdisciplina"></span></option>
+                      </select>
+                    </div>
+                    <div id="paise-container">
+                      <hr class="my-4"/>
+                      <span id="nice-pais">País</span>
+                      <select class="form-select" id="select-pais">
+                        <option value="0"><span id="nice-pais">País...</span></option>
+                      </select>
+                    </div>
+                    <div>
+                      <hr class="my-4"/>
+                      <span id="nice-universidad">Universidad</span>
+                      <select class="form-select" id="select-universidad">
+                        <option value="0"><span id="nice-universidad">Universidad...</span></option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <hr class="my-4"/>
+                      <span id="nice-precio">Precio</span>
+                      <div class="row">
+                        <div class="col-6 d-flex">
+                          <label for="formFile" class="price-input-lable">$</label>
+                          <input type="number" class="price-input" id="min-price" value="2000" min="2000" max="200000">
+                        </div>
+                        <div class="col-6 d-flex">
+                          <label for="formFile" class="price-input-lable">$</label>
+                          <input type="number" class="price-input" id="max-price" value="200000" min="2000" max="200000">
+                        </div>
+                      </div>
+
+                      <!--
+                      <div class="middle mt-3 mr-3">
+                        
+                        
+                        <div class="multi-range-slider">
+                          <input type="range" id="input-left" min="2000" max="200000" value="2000">
+                          <input type="range" id="input-right" min="2000" max="200000" value="200000">
+
+                          <div class="slider-c">
+                            <div class="track"></div>
+                            <div class="range"></div>
+                            <div class="thumb left">
+                              <label class="float-left" id="label-min-price">$2000</label>
+                            </div>
+                            <div class="thumb right">
+                              <label class="float-right" id="label-max-price">$200000</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      -->
+                      <input type="hidden" id="input-pagination_number" value="1"/>
+                      <input type="hidden" id="pais" value="'.$pais.'"/>
+                      <input type="hidden" id="disciplina_id" value="'.$disciplina_id.'"/>
+                    </div> 
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-12 col-sm-9" id="contentProgramas">
+              <div class="d-flex justify-content-center">
+                <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status"></div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-9 d-flex justify-content-center mt-3">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary " disabled id="prev"> < </button>
+                <button type="button" class="btn btn-primary "> <span id="current-pagination">1</span> de <span id="total-paginations"></span> </button>
+                <button type="button" class="btn btn-primary" id="next"> > </button>
+              </div>
+            </div>
+        </div>
+    ';
+    return $content;
+}
+add_shortcode('super_search_pais', 'content_por_pais');
 
 function content(){
     devtzal_enqueue_script();
+    wp_register_script('my_main', plugins_url('/assets/main.js?time='.rand(),__FILE__ ), [], '', true);
+    wp_enqueue_script('my_main');
     $content='';
     $types = get_post_types( [], 'objects' );
     $content.='
-  
         <div class="row justify-content-end margin-initial">
           <div class="col-12 col-sm-9">
             <div class="row justify-content-end">
@@ -64,10 +188,16 @@ function content(){
           </div>
         </div>
         <div class="row justify-content-end">
-            <div class="col-12 col-sm-3" id="filters-container">
+            <div class="col-12 col-sm-3">
               <div class="row">
+                <button type="button" id="nice-busqueda" class="btn btn-outline-primary text-left mb-3 col-12 toggle-filters">
+                  Búsqueda
+                  <img src="'.plugins_url('/assets/arrow-down-sign-to-navigate.png',__FILE__).'" width="1em" class="d-sm-none"/>
+                </button>
+              </div>
+              <div class="row" id="filters-container">
                 <div class="position-fixed_ col-12">
-                    <div id="nice-busqueda" class="text-left mb-3">Búsqueda</div>
+                    <button type="button" id="deleted-filters" class="btn btn-primary">Eliminar Filtros</button>
                     <div>
                       <span id="nice-tipo-estudios">Tipo de estudios</span>
                       <select class="form-select" id="select-tipo-studios">
@@ -158,6 +288,7 @@ function content(){
             <div class="col-12 col-sm-9 d-flex justify-content-center mt-3">
               <div class="btn-group" role="group">
                 <button type="button" class="btn btn-primary " disabled id="prev"> < </button>
+                <button type="button" class="btn btn-primary "> <span id="current-pagination">1</span> de <span id="total-paginations"></span> </button>
                 <button type="button" class="btn btn-primary" id="next"> > </button>
               </div>
             </div>
@@ -203,17 +334,18 @@ function getProgramas( WP_REST_Request $request ){
 
     $args = [
       'post_type' => 'programas',
-      'orderby'   => 'post_title',
-      'order' => 'ASC',
+      'orderby'   => 'menu_order',
+      'order' => 'DESC',
       'posts_per_page'=>$posts_per_page,
       'offset'=> ($pagination_number - 1) * $posts_per_page,
       'tax_query'=>[],
-      //   'relation' => 'AND',
-      // ],
-      'meta_query'=>[]
+      'meta_query'=>[],
     ];
     
     if( $disciplina ){
+      // if ($disciplina == "247"){
+      //   $disciplina=[$disciplina, "119"];
+      // }
       array_push($args['tax_query'],[
         'taxonomy'         => 'programas-categories',
         'terms'            => $disciplina,
@@ -243,9 +375,13 @@ function getProgramas( WP_REST_Request $request ){
       ]);
     }
     if( $tipoEstudio ){
+      $value=$tipoEstudio;
+      if($tipoEstudio=='Licenciatura'){
+        $value=['Licenciatura con Honores', $tipoEstudio];
+      }
       array_push($args['meta_query'],[
         'key' => 'nivel__pxid_dodgcgpusgnbpny_2',
-        'value' => $tipoEstudio,
+        'value' => $value,
       ]);
     }
     if($universidad){
@@ -259,8 +395,8 @@ function getProgramas( WP_REST_Request $request ){
 
       $args2=[
         'post_type' => 'programas',
-        'orderby'   => 'post_title',
-        'order' => 'ASC',
+        'orderby'   => 'menu_order',
+        'order' => 'DESC',
         'posts_per_page'=>$posts_per_page,
         'offset'=> ($pagination_number - 1) * $posts_per_page,
         'tax_query'=>[],
@@ -302,9 +438,11 @@ function getProgramas( WP_REST_Request $request ){
             $programa->universidad = get_field( 'campus__pxid_durqhfzxqpupgom_0', $programa->ID );
             $programa->tipoStudio = get_field( 'nivel__pxid_dodgcgpusgnbpny_2', $programa->ID );
             $programa->moneda = get_field( 'moneda__pxid_dqfqzmqwmojmcon_0', $programa->ID );
-            $programa->precio_nice = money_format('%.2n', intval( get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID ) ) );
+            $programa->precio_nice = get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID ) != null ? number_format(intval( get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID ) ) ): 0;
+            //$programa->precio_nice = money_format('%.2n', intval( get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID ) ) );
             $programa->image = get_the_post_thumbnail_url( $programa->ID );
             $programa->permalink = get_permalink( $programa->ID );
+            $programa->aprioridad = get_field( '__pxid_gbjenfhyuqjvzbf_0', $programa->ID );
             array_push($response["posts"], $programa);
         }
         
@@ -533,17 +671,9 @@ function devtzal_enqueue_script() {
     wp_enqueue_style( 'bootstrap',  $plugin_url . "/assets/bootstrap.min.css");
     wp_enqueue_style( 'style',  $plugin_url . "/assets/style.css?time=".rand());
 
-    // wp_register_script('bootstrap_js', plugins_url('/assets/bootstrap.min.js',__FILE__ ), [], '', true);
-    // wp_enqueue_script('bootstrap_js');
-    // wp_register_script('jquery_3_5_1', plugins_url('/assets/jquery-3.5.1.min.js',__FILE__ ), [], '', true);
-    // wp_enqueue_script('jquery_3_5_1');
-    // wp_register_script('slider3', plugins_url('/assets/slider3.js?='.rand(),__FILE__ ), [], '', true);
-    // wp_enqueue_script('slider3');
     wp_register_script('typehead', plugins_url('/assets/typeahead.bundle.min.js',__FILE__ ), [], '', true);
     wp_enqueue_script('typehead');
     wp_register_script('bloodhound', plugins_url('/assets/bloodhound.min.js',__FILE__ ), [], '', true);
     wp_enqueue_script('bloodhound');
-    wp_register_script('my_main', plugins_url('/assets/main.js?time='.rand(),__FILE__ ), [], '', true);
-    wp_enqueue_script('my_main');
 }
 // add_action('wp_enqueue_scripts', 'devtzal_enqueue_script');

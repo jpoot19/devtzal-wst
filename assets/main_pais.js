@@ -11,110 +11,85 @@ var START_FETCH=false;
 var PRICE_CHANGED=false;
 var aborter = null;
 var ALL_DISCIPLINAS=[];
-
+let PAIS,DISCIPLINA_ID=null;
 jQuery( document ).ready(function() {  
+    PAIS=jQuery('#pais').val().length > 0 ? jQuery('#pais').val() : null;
+    if(PAIS){
+        jQuery('#paise-container').hide();
+    }else{
+        PAICES.forEach(pais=>{
+            let optionHtml=`<option value="${pais.value}">${pais.name}</span></option>`
+            jQuery('#select-pais').append(optionHtml);
+        });
+    }
+    DISCIPLINA_ID=jQuery('#disciplina_id').val();
     TIPO_ESTUDIOS.forEach(tipoEstudio=>{
         let optionHtml=`<option value="${tipoEstudio.value}">${tipoEstudio.name}</span></option>`
         jQuery('#select-tipo-studios').append(optionHtml);
     });
-    /**
-     * End multi range
-     */
-    PAICES.forEach(pais=>{
-        let optionHtml=`<option value="${pais.value}">${pais.name}</span></option>`
-        jQuery('#select-pais').append(optionHtml);
-    });
 
     UNIVERSIDADES.forEach(item=>{
-        let optionHtml=`<option value="${item.value}">${item.name}</span></option>`
-        jQuery('#select-universidad').append(optionHtml);
+        if(PAIS){
+            if(item.contry==PAIS){
+                let optionHtml=`<option value="${item.value}">${item.name}</span></option>`
+                jQuery('#select-universidad').append(optionHtml);
+            }
+        }else{
+            let optionHtml=`<option value="${item.value}">${item.name}</span></option>`
+            jQuery('#select-universidad').append(optionHtml);
+        }
     });
 
     getDisciplinas()
     .then(disciplinas=>{
         jQuery('#loader-disciplinas').fadeOut(800);
         disciplinas.forEach(disciplina => {
-            // let shortcode='[super_search_pais pais="irlanda" disciplina_id="'+disciplina.term_id+'"]'+disciplina.name;
+            // let shortcode='[super_search_pais disciplina_id="'+disciplina.term_id+'"]'+disciplina.name;
             // console.log(shortcode);
-            let optionHtml=`<option value="${disciplina.term_id}">${disciplina.name}</span></option>`
-            jQuery('#select-disciplinas').append(optionHtml);    
+            if(DISCIPLINA_ID.length>0){
+                if(disciplina.term_id==DISCIPLINA_ID){
+                    let optionHtml=`<option selcted value="${disciplina.term_id}">${disciplina.name}</span></option>`
+                    jQuery('#select-disciplinas').empty().append(optionHtml);
+                    jQuery('#select-disciplinas').trigger("change");
+                }
+            }else{
+                
+                let optionHtml=`<option value="${disciplina.term_id}">${disciplina.name}</span></option>`
+                jQuery('#select-disciplinas').append(optionHtml);    
+            }
         });
         jQuery('#select-disciplinas').fadeIn(800);
         jQuery('#loader-disciplinas').hide(800);
     });
     
     initPostPropgramas();
-    
-    var universidades = new Bloodhound({
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        // `states` is an array of state names defined in "The Basics"
-        local: UNIVERSIDADES
-    });
-    var contrys = new Bloodhound({
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-        // `states` is an array of state names defined in "The Basics"
-        local: PAICES
-    });
-    
-    jQuery('#search-by-location').typeahead(
-        {
-            highlight: true
-        }, 
-        {
-            // displayKey: 'name',
-            displayKey: (data)=>data.name,
-            source: universidades.ttAdapter(),
-            templates: {
-                header: '<label class="ml-3">Escuelas</label>',
-                suggestion: (data)=>{
-                    return(`
-                        <div class="suggestion-container">
-                            <span>${data.name}</span>
-                            <small class="suggestion-country">${data.contry}</small>
-                        </div>
-                    `)
-                },
-            }
-        },
-        {
-            displayKey: 'name',
-            source: contrys.ttAdapter(),
-            templates: {
-                header: '<label class="ml-3">Países</label>'
-            }
-        }
-    );
-    setAllDisciplinas()
-    .then(items=>{
-        ALL_DISCIPLINAS=items;
-        var disciplinas = new Bloodhound({
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-            // `states` is an array of state names defined in "The Basics"
-            local: ALL_DISCIPLINAS
-        });
-      
-        jQuery('#search-by-disciplina').typeahead(null, {
-            displayKey: 'name',
-            source: disciplinas.ttAdapter(),
-            // templates: {
-            //     header: '<label class="ml-3">Disciplinas</label>'
-            // }
-        });
-    });
-    
+
     DOCUMENT_READY=true;
 });
 
 // inputLeft.addEventListener("input", setLeftValue);
 // inputRight.addEventListener("input", setRightValue);
-
+jQuery(document).on('click', '#deleted-filters', function(){
+   
+    document.getElementById('select-tipo-studios').value = 0;
+    if (!DISCIPLINA_ID) document.getElementById('select-disciplinas').value = 0;
+    document.getElementById('select-subdisciplina').value = 0;
+    if (!PAIS) document.getElementById('select-pais').value = 0;
+    document.getElementById('select-universidad').value = 0;
+    initPostPropgramas();
+   
+});
 jQuery(document).on('click', '#prev', function(){
     const pagina = parseInt(jQuery('#input-pagination_number').val())-1;
-    jQuery('#input-pagination_number').val(pagina);
     jQuery('#current-pagination').text(pagina);
+    jQuery('#input-pagination_number').val(parseInt(jQuery('#input-pagination_number').val())-1);
+    jQuery("html, body").animate({ scrollTop: 0 }, "fast");
+    initPostPropgramas();
+});
+jQuery(document).on('click', '#next', function(){
+    const pagina = parseInt(jQuery('#input-pagination_number').val())+1;
+    jQuery('#current-pagination').text(pagina);
+    jQuery('#input-pagination_number').val(parseInt(jQuery('#input-pagination_number').val())+1);
     jQuery("html, body").animate({ scrollTop: 0 }, "fast");
     initPostPropgramas();
 });
@@ -122,31 +97,12 @@ jQuery(document).on('click', '.toggle-filters', function(){
     jQuery('#filters-container').toggle();
     jQuery('.toggle-filters >img').toggleClass('active');
 });
-jQuery(document).on('click', '#next', function(){
-    const pagina = parseInt(jQuery('#input-pagination_number').val())+1;
-    jQuery('#input-pagination_number').val(pagina);
-    jQuery('#current-pagination').text(pagina);
-    jQuery("html, body").animate({ scrollTop: 0 }, "fast");
-    initPostPropgramas();
-});
-jQuery(document).on('click', '#deleted-filters', function(){
-   
-    document.getElementById('select-tipo-studios').value = 0;
-    document.getElementById('select-disciplinas').value = 0;
-    document.getElementById('select-subdisciplina').value = 0;
-    document.getElementById('select-pais').value = 0;
-    document.getElementById('select-universidad').value = 0;
-    initPostPropgramas();
-   
-});
+
 jQuery(document).on('change', '#select-tipo-studios, #select-subdisciplina, #select-universidad', function(){
     jQuery('#input-pagination_number').val(1);
-    
-    //jQuery('#current-pagination').text(1);
-    //console.log(jQuery('#input-pagination_number').val());
     jQuery('#prev').prop( "disabled", true );
     jQuery('#next').prop( "disabled", false );
-    initPostPropgramas(false,true);
+    initPostPropgramas();
 });
 
 jQuery(document).on('input', '#search-by-location, #search-by-disciplina', function(){
@@ -188,14 +144,13 @@ jQuery(document).on('change', '#select-pais', function(){
     
     jQuery('#select-universidad').empty().append('<option value="0"><span id="nice-universidad">Universidad...</span></option>');
     universidadByPais.forEach(item=> jQuery('#select-universidad').append(`<option value="${item.value}">${item.name}</span></option>`) );
-    initPostPropgramas(false,true);
+    initPostPropgramas();
 });
 
 jQuery(document).on('change','#input-left, #input-right', function(){
     if( DOCUMENT_READY ) {
         PRICE_CHANGED=true
-        //initPostPropgramas();
-        initPostPropgramas(false,true);
+        initPostPropgramas();
     }
 });
 
@@ -206,7 +161,7 @@ jQuery(document).on('change', '#select-disciplinas', async function(){
         jQuery('#prev').prop( "disabled", true );
         jQuery('#next').prop( "disabled", false );
 
-        initPostPropgramas(false,true);
+        initPostPropgramas();
         jQuery('#nice-tipo-subdisciplina').text('');
         jQuery('.hr, #select-subdisciplina').hide(800);
         if( this.value !=0 ){
@@ -255,7 +210,7 @@ const getInputsData=()=>{
     const disciplina = jQuery('#select-disciplinas option:selected').val() == 0 ? null : jQuery('#select-disciplinas option:selected').val();
     const subdisciplina = jQuery('#select-subdisciplina option:selected').val() == 0 ? null : jQuery('#select-subdisciplina option:selected').val();
     const universidad = jQuery('#select-universidad option:selected').val() == 0 ? null : jQuery('#select-universidad option:selected').text();
-    const pais = jQuery('#select-pais option:selected').val() == 0 ? null : jQuery('#select-pais option:selected').val();
+    const pais = PAIS ? PAIS : jQuery('#select-pais option:selected').val() == 0 ? null : jQuery('#select-pais option:selected').val();
     const minPrice = jQuery('#min-price').val() == 0 ? null : jQuery('#min-price').val();
     const maxPrice = jQuery('#max-price').val() == 0 ? null : jQuery('#max-price').val();
     
@@ -275,21 +230,12 @@ const getInputsData=()=>{
     }
     return queryData;
 }
-const initPostPropgramas=async ( fromText=false, restartPagination=false )=>{
+const initPostPropgramas=async ( fromText=false )=>{
     if(!fromText && DOCUMENT_READY)jQuery('#search-by-location, #search-by-disciplina').typeahead('val', null);
     try {
         jQuery('#contentProgramas').html(`<div class="d-flex justify-content-center"><div class="spinner-border" style="width: 3rem; height: 3rem;" role="status"></div></div>`);
         PROGRAMAS = await getProgramas(fromText);
-        const pagina = parseInt(jQuery('#input-pagination_number').val())+1;
-        if(restartPagination){
-            if(parseInt(jQuery('#total-paginations').val()) == 0){
-                jQuery('#current-pagination').text(jQuery('#total-paginations').val());
-            }else{
-                jQuery('#current-pagination').text(jQuery('#input-pagination_number').val());
-            }
-            
-        }
-        //jQuery('#current-pagination').text(pagina);
+        
         if(PROGRAMAS.length >0){
             let html = '';
             PROGRAMAS.forEach(programa => html += buildProgramaCard(programa) );
@@ -367,8 +313,8 @@ const getProgramas = async (fromText=false)=>{
             }
         );
         const dataProgramas= await response.json();
-        aborter = null;
         jQuery('#total-paginations').text(dataProgramas.total_pagination);
+        aborter = null;
         handlePaginationButtons(dataProgramas.total_pagination);
         return dataProgramas.posts;
     } catch (error) {
