@@ -5,14 +5,17 @@
 // var thumbRight = document.querySelector(".thumb.right");
 // var range = document.querySelector(".slider-c > .range");
 
-const POST_PER_PAGE = 14;
+const POST_PER_PAGE = 4;
 var DOCUMENT_READY=false;
 var START_FETCH=false;
 var PRICE_CHANGED=false;
 var aborter = null;
 var ALL_DISCIPLINAS=[];
 let PAIS,DISCIPLINA_ID=null;
-jQuery( document ).ready(function() {  
+let UNIVERSIDADES=[];
+
+jQuery( document ).ready(function() {
+    jQuery('#select-subdisciplina+.select2-container').hide();
     PAIS=jQuery('#pais').val().length > 0 ? jQuery('#pais').val() : null;
     if(PAIS){
         jQuery('#paise-container').hide();
@@ -28,7 +31,7 @@ jQuery( document ).ready(function() {
         jQuery('#select-tipo-studios').append(optionHtml);
     });
 
-    UNIVERSIDADES.forEach(item=>{
+    /* UNIVERSIDADES.forEach(item=>{
         if(PAIS){
             if(item.contry==PAIS){
                 let optionHtml=`<option value="${item.value}">${item.name}</span></option>`
@@ -38,8 +41,37 @@ jQuery( document ).ready(function() {
             let optionHtml=`<option value="${item.value}">${item.name}</span></option>`
             jQuery('#select-universidad').append(optionHtml);
         }
+    }); */
+    getUniversities()
+    .then(universities=>{
+        
+        universities.forEach(university => {
+            // let shortcode='[super_search_pais pais="irlanda" disciplina_id="'+disciplina.term_id+'"]'+disciplina.name;
+            // console.log(shortcode);
+            let optionHtml=`<option value="${university}">${university}</span></option>`
+            jQuery('#select-universidad').append(optionHtml);
+        });
+        jQuery('#select-disciplinas').fadeIn(800);
+        jQuery('#loader-disciplinas').hide(800);
     });
 
+    getProgramTypes()
+    .then(
+        programTypes=>{
+            jQuery('#loader-program-types').fadeOut(800);
+            programTypes.forEach(programType => {
+                // let shortcode='[super_search_pais disciplina_id="'+disciplina.term_id+'"]'+disciplina.name;
+                // console.log(shortcode);
+                let optionHtml=`<option selcted value="${programType.term_id}">${programType.name}</span></option>`
+                jQuery('#select-type').empty().append(optionHtml);
+                jQuery('#select-type').trigger("change");
+                        
+                    
+          
+            jQuery('#select-type').fadeIn(800);
+            jQuery('#oader-program-types').hide(800);
+            });
+        });
     getDisciplinas()
     .then(disciplinas=>{
         jQuery('#loader-disciplinas').fadeOut(800);
@@ -71,11 +103,44 @@ jQuery( document ).ready(function() {
 // inputRight.addEventListener("input", setRightValue);
 jQuery(document).on('click', '#deleted-filters', function(){
    
-    document.getElementById('select-tipo-studios').value = 0;
-    if (!DISCIPLINA_ID) document.getElementById('select-disciplinas').value = 0;
-    document.getElementById('select-subdisciplina').value = 0;
-    if (!PAIS) document.getElementById('select-pais').value = 0;
-    document.getElementById('select-universidad').value = 0;
+    // document.getElementById('select-tipo-studios').value = 0;
+    // if (!DISCIPLINA_ID) document.getElementById('select-disciplinas').value = 0;
+    // document.getElementById('select-subdisciplina').value = 0;
+    // if (!PAIS) document.getElementById('select-pais').value = 0;
+    // document.getElementById('select-universidad').value = 0;
+
+    if (!DISCIPLINA_ID){
+        if(jQuery('#select-disciplinas').hasClass('select2-hidden-accessible')){
+            jQuery('#select-disciplinas').val(0).trigger('change');
+        }else {
+            document.getElementById('select-disciplinas').value = 0;
+        }
+    }
+    if (!PAIS){
+        if(jQuery('#select-pais').hasClass('select2-hidden-accessible')){
+            jQuery('#select-pais').val(0).trigger('change');
+        }else {
+            document.getElementById('select-pais').value = 0;
+        }
+    }
+    if(jQuery('#select-tipo-studios').hasClass('select2-hidden-accessible')){
+        jQuery('#select-tipo-studios').val(0).trigger('change');
+    }else {
+        document.getElementById('select-tipo-studios').value = 0;
+    }
+    
+    if(jQuery('#select-subdisciplina').hasClass('select2-hidden-accessible')){
+        jQuery('#select-subdisciplina').val(0).trigger('change');
+    }else {
+        document.getElementById('select-subdisciplina').value = 0;
+    }
+    
+    if(jQuery('#select-universidad').hasClass('select2-hidden-accessible')){
+        jQuery('#select-universidad').val(0).trigger('change');
+    }else {
+        document.getElementById('select-universidad').value = 0;
+    }
+
     initPostPropgramas();
    
 });
@@ -142,7 +207,7 @@ jQuery(document).on('change', '#select-pais', function(){
     const tempUni = [...UNIVERSIDADES]
     const universidadByPais = tempUni.filter(item=>item.contry==this.value);
     
-    jQuery('#select-universidad').empty().append('<option value="0"><span id="nice-universidad">Universidad...</span></option>');
+    jQuery('#select-universidad').empty().append('<option value="0"><span id="nice-universidad">University...</span></option>');
     universidadByPais.forEach(item=> jQuery('#select-universidad').append(`<option value="${item.value}">${item.name}</span></option>`) );
     initPostPropgramas();
 });
@@ -164,18 +229,20 @@ jQuery(document).on('change', '#select-disciplinas', async function(){
         initPostPropgramas();
         jQuery('#nice-tipo-subdisciplina').text('');
         jQuery('.hr, #select-subdisciplina').hide(800);
+        jQuery('#select-subdisciplina+.select2-container').hide();
         if( this.value !=0 ){
             jQuery('#nice-tipo-subdisciplina').text( jQuery("#select-disciplinas option:selected" ).text() );
             jQuery('#loader-subdisciplina, .hr').show(800);
             const response = await fetch(`/wp-json/devtzal/v1/subdisciplinas?id=${this.value}`);
             const data = await response.json();
             
-            jQuery('#select-subdisciplina').empty().append('<option value="0"><span id="nice-universidad">Subdisciplina...</span></option>');
+            jQuery('#select-subdisciplina').empty().append('<option value="0"><span id="nice-universidad">Subdisciplines...</span></option>');
             
             data.forEach(item=> jQuery('#select-subdisciplina').append(`<option value="${item.term_id}">${item.name}</span></option>`) );
 
             jQuery('#loader-subdisciplina').hide(800);
             jQuery('#select-subdisciplina').show(800);
+            jQuery('#select-subdisciplina+.select2-container').show(800);
         }
     } catch (error) {
        console.log(error);
@@ -312,7 +379,9 @@ const getProgramas = async (fromText=false)=>{
                 body: fromText ? bodyFromText : bodyInputs
             }
         );
+        console.log(bodyFromText);
         const dataProgramas= await response.json();
+        console.log(dataProgramas);
         jQuery('#total-paginations').text(dataProgramas.total_pagination);
         aborter = null;
         handlePaginationButtons(dataProgramas.total_pagination);
@@ -343,7 +412,31 @@ const setAllDisciplinas = async ()=>{
     const dataDisciplinas= await response.json();
     return dataDisciplinas;
 };
+const getProgramTypes = async ()=>{
+    const response = await fetch('/wp-json/devtzal/v1/types?all=1');
+    const dataProgramTypes = await response.json();
+    console.log(dataProgramTypes);
+    return dataProgramTypes;
+};
+
+const getUniversities = async ()=>{
+    
+    let disciplina = jQuery('#select-disciplinas option:selected').val() == 0 ? null : jQuery('#select-disciplinas option:selected').val();
+    
+    let response;
+    if(disciplina != null){
+         response = await fetch('/wp-json/devtzal/v1/universities?disciplina='+disciplina);
+    }else{
+        response = await fetch('/wp-json/devtzal/v1/universities?disciplina');
+    }
+
+    let dataUniversities= await response.json();
+    UNIVERSIDADES = dataUniversities;
+    console.log(dataUniversities);
+    return dataUniversities;
+};
 const buildProgramaCard=(programa)=>{
+    console.log(programa);
     const img =url=>{
         if(url){
             return`<img class="programas-img mt-3" src="${programa.image}" />`
@@ -364,7 +457,7 @@ const buildProgramaCard=(programa)=>{
             <div class="col-12 col-md-9">
                 <div class="row lscf-post-heading align-items-center">
                     <div class="col-12 col-md-8">
-                        <div class="caption-container title-post mt-1">
+                        <div class="caption-container title-post mt-1 mb-3">
                             <a class="list-view lscf-title ng-binding post-title text-left" href="${programa.permalink}" >${programa.post_title}</a>
                         </div>
                         <div class="caption  overflow-hidden">
@@ -374,8 +467,8 @@ const buildProgramaCard=(programa)=>{
 
                     <div class="col-12 col-md-4 lscf-price-label" style="text-align: right">
                         <div class="price ng-scope text-center text-sm-right" >
-                            <div class="price mb-3 mt-1" >${programa.precio_nice==0 ? '' : programa.precio_nice} ${programa.precio_nice==0? '':programa.moneda} ${programa.precio_nice==0? '':'/ año'}</div>
-                            <div class="price my-3 mb-3 mb-sm-3">${programa.duracion=='0/ año' ? '' : programa.duracion}</div>
+                            <div class="price mb-3 mt-1" >${programa.precio_nice==0 ? '' : programa.precio_nice} ${programa.precio_nice==0? '':programa.moneda} ${programa.precio_nice==0? '':'/ '}</div>
+                            <div class="price my-3 mb-3 mb-sm-3">${programa.duracion=='0/' ? '' : programa.duracion}</div>
                         </div>
                     </div>
                 </div>
@@ -387,26 +480,28 @@ const buildProgramaCard=(programa)=>{
 let PROGRAMAS=[];
 let TIPO_ESTUDIOS=[
     {
-        name:'Licenciatura',
+        name:'Bachelors Degree',
         value:'Licenciatura',
-    },
-    // {
-    //     name:'Licenciatura con Honores',
-    //     value:'Licenciatura con Honores',
-    // },
-    {
-        name:'Master',
-        value:'Master',
+        
     },
     {
-        name:'Idiomas',
-        value:'Idiomas',
+        name:'Honors Bachelor',
+        value:'Licenciatura con Honores',
+    },
+    {
+         name:'Master',
+         value:'Maestría',
+    },
+    
+    {
+        name:'Languages',
+        value:'Inglés',
     },
 ]
 let PAICES=[
     {
         name:'Irlanda',
-        value:'irlanda',
+        value:'Irlanda',
     },
     {
         name:'Alemania',
@@ -418,15 +513,15 @@ let PAICES=[
     },
     {
         name:'Canadá',
-        value:'canada',
+        value:'canadá',
     },
 ];
 
-let UNIVERSIDADES=[
+/* let UNIVERSIDADES=[
     {
         name: 'University College Cork',
         value:1,
-        contry:'irlanda'
+        contry:'Irlanda'
     },
     {
         name: 'University of Limerick',
@@ -459,9 +554,9 @@ let UNIVERSIDADES=[
         contry:'irlanda'
     },
     {
-        name: 'Griffith College',
+        name: 'Griffith College Dublin',
         value:8,
-        contry:'irlanda'
+        contry:'Irlanda'
     },
     {
         name: 'Technological University Dublin',
@@ -508,5 +603,36 @@ let UNIVERSIDADES=[
         value:18,
         contry:'irlanda',
     },
-    
+    {
+        name: 'Institute of Technology Carlow',
+        value:19,
+        contry:'irlanda',
+    },
+    {
+        name: 'Waterford Institute of Technology',
+        value:20,
+        contry:'irlanda',
+    },
+    {
+        name: 'Athlone Institute of Technology',
+        value:21,
+        contry:'irlanda',
+    },
+    {
+        name: 'Letterkenny Institute of Technology',
+        value:22,
+        contry:'irlanda',
+    },
+    {
+        name: 'National College of Ireland',
+        value:23,
+        contry:'irlanda',
+    },
+    {
+        name: 'Trebas Institute',
+        value:24,
+        contry:'canadá',
+    },
+   
 ];
+ */
