@@ -340,7 +340,7 @@ function getProgramas( WP_REST_Request $request ){
     $minPrice = $body["minPrice"]; //meta data
     $maxPrice = $body["maxPrice"]; //meta data
     $tipoEstudio = $body["tipoEstudio"]; //meta data
-    //$lang = $body["lang"];
+    $lang = $body["lang"];
 
     $fromText = $body["fromText"]; //meta data
     
@@ -522,20 +522,24 @@ function getProgramas( WP_REST_Request $request ){
             { */
               $field = get_field_object('field_603596909e1fc', $programa->ID);
               $value = get_field( 'duracion', $programa->ID );
-              //$label = $field['choices'][ $value ];
-              if(strcmp($value, "Menor a 2 años") == 0 ){
-                  $value = 'Less than 2 years';
-              }else if(strcmp($value, "2 años") == 0){
-                $value = '2 years';
+              if($lang != 'es')
+              {
+                  //$label = $field['choices'][ $value ];
+                    if(strcmp($value, "Menor a 2 años") == 0 ){
+                      $value = 'Less than 2 years';
+                    }else if(strcmp($value, "2 años") == 0){
+                      $value = '2 years';
+                    }
+                    else if(strcmp($value, "3 años") == 0){
+                      $label = '3 years';
+                    }else if(strcmp($value, "4 años") == 0){
+                      $value = '4 years';
+                    }
+                    else if(strcmp($value, "Más de 4 años") == 0){
+                      $value = 'More than 4 years';
+                    }
               }
-              else if(strcmp($value, "3 años") == 0){
-                $label = '3 years';
-              }else if(strcmp($value, "4 años") == 0){
-                $value = '4 years';
-              }
-              else if(strcmp($value, "Más de 4 años") == 0){
-                $value = 'More than 4 years';
-              }
+              
 
               $programa->duracion = $value; //get_field( 'duracion', $programa->ID );
               $programa->locacion=  get_field( 'pais', $programa->ID );
