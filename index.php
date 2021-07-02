@@ -5,8 +5,7 @@ Plugin URI: https://devtzal.com/
 Description: Plugin .
 Version: 1.0
 Author: Jose Briceño
-Text Domain: devtzal-wst
-Domain Path: /assets/languages
+
 */
 
 if ( !function_exists('add_action') ){
@@ -43,9 +42,7 @@ function init_admin_content(){
 function content_por_pais( $atts ){
     $pais =  $atts['pais'];
     $disciplina_id =  $atts['disciplina_id'];
-    $lang = $atts['lang'];
-    //$sitelang = $sitepress->get_current_language();
-    //$sitepress->switch_lang($lang);
+    
     devtzal_enqueue_script();
     wp_register_script('main_pais', plugins_url('/assets/main_pais.js?time='.rand(),__FILE__ ), [], '', true);
     wp_enqueue_script('main_pais');
@@ -59,27 +56,26 @@ function content_por_pais( $atts ){
             <div class="col-12 col-sm-3">
               <div class="row">
                 <button type="button" id="nice-busqueda" class="btn btn-outline-primary text-left mb-3 col-12 toggle-filters">
-                  Search
+                  Búsqueda
                   <img src="'.plugins_url('/assets/arrow-down-sign-to-navigate.png',__FILE__).'" width="1em" class="d-sm-none"/>
                 </button>
-               
               </div>
               <div class="row" id="filters-container">        
                 <div class="position-fixed_ col-12">
-                    <button type="button" id="deleted-filters" class="btn btn-primary">Clean Filters</button>
-                    <div class = "mt-3">
-                      <span id="nice-tipo-estudios">'.esc_html( __( 'Program Types', 'devtzal-wst' ) ).'</span>
+                    <button type="button" id="deleted-filters" class="btn btn-primary">Eliminar Filtros</button>
+                    <div>
+                      <span id="nice-tipo-estudios">Tipo de estudios</span>
                       <select class="form-select" id="select-tipo-studios">
-                        <option value="0"><span id="nice-tipo-estudios">Program Types...</span></option>
+                        <option value="0"><span id="nice-tipo-estudios">Tipo de estudios...</span></option>
                       </select>
                     </div>
-                  
+                    
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-tipo-disciplinas">'.esc_html( __( 'Disciplines', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-tipo-disciplinas">Disciplinas</span>
                       <div class="spinner-border spinner-border-sm" id="loader-disciplinas" role="status"></div>
                       <select class="form-select" id="select-disciplinas" style="display:none;">
-                        <option value="0" ><span id="nice-disciplinas">'.esc_html( __( 'Disciplines ...', 'devtzal-wst' ) ).'</span></option>
+                        <option value="0" ><span id="nice-disciplinas">Disciplinas...</span></option>
                       </select>
                     </div>
                     
@@ -93,22 +89,22 @@ function content_por_pais( $atts ){
                     </div>
                     <div id="paise-container">
                       <hr class="my-4"/>
-                      <span id="nice-pais">'.esc_html( __( 'Country', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-pais">País</span>
                       <select class="form-select" id="select-pais">
-                        <option value="0"><span id="nice-pais">'.esc_html( __( 'Countries ...', 'devtzal-wst' ) ).'</span></option>
+                        <option value="0"><span id="nice-pais">País...</span></option>
                       </select>
                     </div>
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-universidad">'.esc_html( __( 'University', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-universidad">Universidad</span>
                       <select class="form-select" id="select-universidad">
-                        <option value="0"><span id="nice-universidad">'.esc_html( __( 'University ...', 'devtzal-wst' ) ).'</span></option>
+                        <option value="0"><span id="nice-universidad">Universidad...</span></option>
                       </select>
                     </div>
 
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-precio">'.esc_html( __( 'Price', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-precio">Precio</span>
                       <div class="row">
                         <div class="col-6 d-flex">
                           <label for="formFile" class="price-input-lable">$</label>
@@ -144,7 +140,6 @@ function content_por_pais( $atts ){
                       <input type="hidden" id="input-pagination_number" value="1"/>
                       <input type="hidden" id="pais" value="'.$pais.'"/>
                       <input type="hidden" id="disciplina_id" value="'.$disciplina_id.'"/>
-                      <input type="hidden" id="lang" value="'.$lang.'"/>
                     </div> 
                 </div>
               </div>
@@ -158,7 +153,7 @@ function content_por_pais( $atts ){
             <div class="col-12 col-sm-9 d-flex justify-content-center mt-3">
               <div class="btn-group" role="group">
                 <button type="button" class="btn btn-primary " disabled id="prev"> < </button>
-                <button type="button" class="btn btn-primary "> <span id="current-pagination">1</span> of <span id="total-paginations"></span> </button>
+                <button type="button" class="btn btn-primary "> <span id="current-pagination">1</span> de <span id="total-paginations"></span> </button>
                 <button type="button" class="btn btn-primary" id="next"> > </button>
               </div>
             </div>
@@ -180,14 +175,14 @@ function content(){
             <div class="row justify-content-end">
               <div class="col-12 col-sm-6 position-relative">
                 
-                <div id="nice-que-estudias" class="text-center_"><b>'.esc_html( __( 'What do you want to study?', 'devtzal-wst' ) ).'</b></div>
-                <input type="text" class="price-input" id="search-by-disciplina" placeholder="'.esc_html( __( 'Business Administration', 'devtzal-wst' ) ).'">
+                <div id="nice-que-estudias" class="text-center_"><b>¿Qué deseas estudiar?</b></div>
+                <input type="text" class="price-input" id="search-by-disciplina" placeholder="Administración de Empresas...">
                 
                 <div class="spinner-border spinner-border-sm" id="loader-disciplinas-text" role="status"></div>
               </div>
               <div class="col-12 col-sm-6">
-                <div id="nice-donde-estudias" class="text-center_"><b>'.esc_html( __( 'Where do you want to study?', 'devtzal-wst' ) ).'</b></div>
-                <input type="text" class="price-input" id="search-by-location" placeholder="'.esc_html( __( 'Irland ...', 'devtzal-wst' ) ).'">
+                <div id="nice-donde-estudias" class="text-center_"><b>¿Dónde deseas estudiar?</b></div>
+                <input type="text" class="price-input" id="search-by-location" placeholder="Irlanda...">
               </div>
             </div>
           </div>
@@ -196,26 +191,26 @@ function content(){
             <div class="col-12 col-sm-3">
               <div class="row">
                 <button type="button" id="nice-busqueda" class="btn btn-outline-primary text-left mb-3 col-12 toggle-filters">
-                '.esc_html( __( 'Search', 'devtzal-wst' ) ).'
+                  Búsqueda
                   <img src="'.plugins_url('/assets/arrow-down-sign-to-navigate.png',__FILE__).'" width="1em" class="d-sm-none"/>
                 </button>
               </div>
               <div class="row" id="filters-container">
                 <div class="position-fixed_ col-12">
-                    <button type="button" id="deleted-filters" class="btn btn-primary">'.esc_html( __( 'Clean Filters', 'devtzal-wst' ) ).'</button>
+                    <button type="button" id="deleted-filters" class="btn btn-primary">Eliminar Filtros</button>
                     <div>
-                      <span id="nice-tipo-estudios">'.esc_html( __( 'Program Types', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-tipo-estudios">Tipo de estudios</span>
                       <select class="form-select" id="select-tipo-studios">
-                        <option value="0"><span id="nice-tipo-estudios">'.esc_html( __( 'Program Types...', 'devtzal-wst' ) ).'</span></option>
+                        <option value="0"><span id="nice-tipo-estudios">Tipo de estudios...</span></option>
                       </select>
                     </div>
                     
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-tipo-disciplinas">'.esc_html( __( 'Disciplines', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-tipo-disciplinas">Disciplinas</span>
                       <div class="spinner-border spinner-border-sm" id="loader-disciplinas" role="status"></div>
                       <select class="form-select" id="select-disciplinas" style="display:none;">
-                        <option value="0" ><span id="nice-disciplinas">'.esc_html( __( 'Disciplines ...', 'devtzal-wst' ) ).'</span></option>
+                        <option value="0" ><span id="nice-disciplinas">Disciplinas...</span></option>
                       </select>
                     </div>
                     
@@ -230,29 +225,23 @@ function content(){
 
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-pais">'.esc_html( __( 'Country', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-pais">País</span>
                       <select class="form-select" id="select-pais">
-                        <option value="0"><span id="nice-pais">'.esc_html( __( 'Countries ...', 'devtzal-wst' ) ).'</span></option>
+                        <option value="0"><span id="nice-pais">País...</span></option>
                       </select>
                     </div>
 
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-universidad">'.esc_html( __( 'University', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-universidad">Universidad</span>
                       <select class="form-select" id="select-universidad">
-                        <option value="0"><span id="nice-universidad">'.esc_html( __( 'Universities', 'devtzal-wst' ) ).'</span></option>
+                        <option value="0"><span id="nice-universidad">Universidad...</span></option>
                       </select>
                     </div>
-                    <!-- <div>
-                      <hr class="my-4"/>
-                      <span id="nice-universidad2">Universidad</span>
-                      <select class="form-select" id="select-universidad2">
-                        <option value="0"><span id="nice-universidad2">'.esc_html( __( 'University ...', 'devtzal-wst' ) ).'</span></option>
-                      </select>
-                    </div> -->
+
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-precio">'.esc_html( __( 'Price', 'devtzal-wst' ) ).'</span>
+                      <span id="nice-precio">Precio</span>
                       <div class="row">
                         <div class="col-6 d-flex">
                           <label for="formFile" class="price-input-lable">$</label>
@@ -297,9 +286,9 @@ function content(){
               </div>
             </div>
             <div class="col-12 col-sm-9 d-flex justify-content-center mt-3">
-              <div class="btn-group dark-text" role="group">
+              <div class="btn-group" role="group">
                 <button type="button" class="btn btn-primary " disabled id="prev"> < </button>
-                <button type="button" class="btn btn-primary "> <span id="current-pagination">1</span> of <span id="total-paginations"></span> </button>
+                <button type="button" class="btn btn-primary "> <span id="current-pagination">1</span> de <span id="total-paginations"></span> </button>
                 <button type="button" class="btn btn-primary" id="next"> > </button>
               </div>
             </div>
@@ -329,177 +318,105 @@ add_action( 'rest_api_init', function () {
   } );
 
 function getProgramas( WP_REST_Request $request ){
-    $body = $request->get_params();
-    //dd($request);
+    $body = $request->get_json_params();
+    
     $posts_per_page = $body["posts_per_page"];
     $pagination_number = $body["pagination_number"];
-    $disciplina = $body["disciplina"];// category(taxonomy)
-    $subdisciplina = $body["subdisciplina"];//sub category(taxonomy)
+    $disciplina = $body["disciplina"];// category
+    $subdisciplina = $body["subdisciplina"];//sub category
     $pais = $body["pais"]; //meta data
     $universidad = $body["universidad"]; //meta data
     $minPrice = $body["minPrice"]; //meta data
     $maxPrice = $body["maxPrice"]; //meta data
     $tipoEstudio = $body["tipoEstudio"]; //meta data
-    $lang = $body["lang"];
 
     $fromText = $body["fromText"]; //meta data
-    
-    // global $sitepress;
-    // $sitepress->switch_lang($lang);
-   
-   
+
     $args = [
-      'post_type' => 'programs',
+      'post_type' => 'programas',
       'orderby'   => 'menu_order',
       'order' => 'DESC',
       'posts_per_page'=>$posts_per_page,
       'offset'=> ($pagination_number - 1) * $posts_per_page,
       'tax_query'=>[],
       'meta_query'=>[],
-      'post_status'=>'publish',
-      'suppress_filters' => false,
-      // 'lang' => $lang
-      
-      //'category' => icl_object_id($disciplina, 'category', true, 'es'),
-      
     ];
-
-/*     array_push($args['meta_query'],[
-      'relation' => 'AND',
-      array(
-        'key' => 'universidad',
-            'value' => 'Dundalk Institute of Technology',
-            'compare' => '!='
-      ),
-      array(
-        'key' => 'universidad',
-            'value' => 'University College of Cork',
-            'compare' => '!='
-      ),
-      array(
-        'key' => 'universidad',
-            'value' => 'University of Limerick',
-            'compare' => '!='
-      ),
-      array(
-        'key' => 'universidad',
-            'value' => 'Griffith College',
-            'compare' => '!='
-      ),
-      array(
-        'key' => 'universidad',
-            'value' => 'IBAT College',
-            'compare' => '!='
-      ),
-      
-      
-    ]);
- */
-   /*  array_push($args['meta_query'],[
-      'relation' => 'AND',
-      array(
-        'key' => 'universidad',
-            'value' => 'University of Limerick',
-            'compare' => '!='
-      ),
-      array(
-        'key' => 'universidad',
-            'value' => 'Griffith College',
-            'compare' => '!='
-      ),
-      
-    ]); */
-
-   /*  array_push($args['meta_query'],[
-      'relation' => 'AND',
-      array(
-        'key' => 'universidad',
-            'value' => 'IBAT College',
-            'compare' => '!='
-      ),
-      array(
-        'key' => 'universidad',
-            'value' => 'ELI Schools',
-            'compare' => '!='
-      ),
-      
-    ]);  */
     
     if( $disciplina ){
-     array_push($args['tax_query'],[
-      'taxonomy' => 'category',
-      'field' => 'term_id',
-      'terms' => $disciplina,
-    ]);
+      // if ($disciplina == "247"){
+      //   $disciplina=[$disciplina, "119"];
+      // }
+      array_push($args['tax_query'],[
+        'taxonomy'         => 'programas-categories',
+        'terms'            => $disciplina,
+      ]);
     }
     if($subdisciplina){
       array_push($args['tax_query'],[
-        'taxonomy'         => 'category',
-        'field' => 'term_id',
+        'taxonomy'         => 'programas-categories',
         'terms'            => $subdisciplina,
       ]);
     }
-    if($minPrice && $maxPrice){
-      if( $minPrice>=0  && $maxPrice>=0 ){
-        array_push($args['meta_query'],[
-          [
-            'key' => 'precio',
-            'value' => [$minPrice, $maxPrice],
-            'compare' => 'BETWEEN',
-            'type'  => 'NUMERIC'
-          ]
-        ]);
-      }
+
+    if( $minPrice && $maxPrice ){
+      array_push($args['meta_query'],[
+        [
+          'key' => 'precio__pxid_fjnxizeqqcolvjx_0',
+          'value' => [$minPrice, $maxPrice],
+          'compare' => 'BETWEEN',
+          'type'  => 'numeric'
+        ]
+      ]);
     }
     if( $pais ){
       array_push($args['meta_query'],[
-        'key' => 'pais',
+        'key' => 'locaci_n__pxid_vmhpboqdvmytbzn_0',
         'value' => $pais,
-        'compare' => 'LIKE',
       ]);
     }
-    if(isset($universidad)){
-      array_push($args['meta_query'],[
-        'key' => 'universidad',
-        'value' => $universidad,
-        'compare' => 'LIKE',
-      ]);
-    }
-    
     if( $tipoEstudio ){
+      $value=$tipoEstudio;
+      if($tipoEstudio=='Licenciatura'){
+        $value=['Licenciatura con Honores', $tipoEstudio];
+      }
       array_push($args['meta_query'],[
-        'key' => 'tipo_de_programa',
-        'value' => $tipoEstudio,
-        'compare' => 'LIKE',
+        'key' => 'nivel__pxid_dodgcgpusgnbpny_2',
+        'value' => $value,
       ]);
     }
+    if($universidad){
+      array_push($args['meta_query'],[
+        'key' => 'campus__pxid_durqhfzxqpupgom_0',
+        'value' => $universidad,
+      ]);
+    }
+
     if($fromText){
 
-        $args2=[
-          'post_type' => 'programs',
-          'orderby'   => 'menu_order',
-          'order' => 'DESC',
-          'posts_per_page'=>$posts_per_page,
-          'offset'=> ($pagination_number - 1) * $posts_per_page,
-          'tax_query'=>[],
-          'meta_query'=>[],
-          'suppress_filters' => false,
-        ];
+      $args2=[
+        'post_type' => 'programas',
+        'orderby'   => 'menu_order',
+        'order' => 'DESC',
+        'posts_per_page'=>$posts_per_page,
+        'offset'=> ($pagination_number - 1) * $posts_per_page,
+        'tax_query'=>[],
+        'meta_query'=>[],
+      ];
 
-        if($disciplina){
-          array_push($args2['tax_query'],[
-                'taxonomy'  => 'category',
-                'field' => 'term_id',
-                'terms' => $disciplina,
-          ]);
-        }
-        if($universidad && $pais ){
-          array_push($args2['meta_query'],[
-            'relation' => 'OR',
-            ['key' => 'universidad', 'value' => $universidad],
-            ['key' => 'pais', 'value' => $pais]
-          ]);
-        }
+      if($disciplina){
+        array_push($args2['tax_query'],[
+              'taxonomy'  => 'programas-categories',
+              'field' => 'name',
+              'terms' => $disciplina,
+        ]);
+      }
+      if($universidad && $pais ){
+        array_push($args2['meta_query'],[
+          'relation' => 'OR',
+          ['key' => 'campus__pxid_durqhfzxqpupgom_0', 'value' => $universidad],
+          ['key' => 'locaci_n__pxid_vmhpboqdvmytbzn_0', 'value' => $pais]
+        ]);
+      }
       
       $programas = new WP_Query( $args2 );
 
@@ -516,50 +433,17 @@ function getProgramas( WP_REST_Request $request ){
 
     foreach ( $programas->posts as $programa ) {
         if($programa->post_status=='publish'){
-            $currentUniversity = get_field( 'universidad', $programa->ID );
-            $disabledUniversities = ['Dundalk Institute of Technology','University College of Cork','University of Limerick','Griffith College','IBAT College','ELI Schools'];
-           /*  if(!in_array($currentUniversity, $disabledUniversities))
-            { */
-              $field = get_field_object('field_603596909e1fc', $programa->ID);
-              $value = get_field( 'duracion', $programa->ID );
-              if($lang != 'es')
-              {
-                  //$label = $field['choices'][ $value ];
-                    if(strcmp($value, "Menor a 2 años") == 0 ){
-                      $value = 'Less than 2 years';
-                    }else if(strcmp($value, "2 años") == 0){
-                      $value = '2 years';
-                    }
-                    else if(strcmp($value, "3 años") == 0){
-                      $label = '3 years';
-                    }else if(strcmp($value, "4 años") == 0){
-                      $value = '4 years';
-                    }
-                    else if(strcmp($value, "Más de 4 años") == 0){
-                      $value = 'More than 4 years';
-                    }
-              }
-              
-
-              $programa->duracion = $value; //get_field( 'duracion', $programa->ID );
-              $programa->locacion=  get_field( 'pais', $programa->ID );
-              $programa->universidad = get_field( 'universidad', $programa->ID );
-              $programa->tipoStudio = get_field( 'tipo_de_programa', $programa->ID );
-              $programa->moneda = get_field( 'moneda', $programa->ID );
-              $programa->precio_nice = get_field( 'precio', $programa->ID ) != null ? number_format(intval( get_field( 'precio', $programa->ID ) ) ): 0;
-              //$programa->precio_nice = money_format('%.2n', intval( get_field( 'precio', $programa->ID ) ) );
-              $programa->image = get_the_post_thumbnail_url( $programa->ID );
-              $programa->permalink = get_permalink( $programa->ID );
-              $programa->category = get_field('category', $programa->ID );
-              $programa->aprioridad = get_field( '__pxid_gbjenfhyuqjvzbf_0', $programa->ID );
-              //$programa->disciplina =   $disciplina;
-             
-         
-              array_push($response["posts"], $programa);
-            // }
-            
-          
-           
+            $programa->duracion = get_field( 'duraci_n__pxid_ikccbauokuraaqn_1', $programa->ID );
+            $programa->locacion=  get_field( 'locaci_n__pxid_vmhpboqdvmytbzn_0', $programa->ID );
+            $programa->universidad = get_field( 'campus__pxid_durqhfzxqpupgom_0', $programa->ID );
+            $programa->tipoStudio = get_field( 'nivel__pxid_dodgcgpusgnbpny_2', $programa->ID );
+            $programa->moneda = get_field( 'moneda__pxid_dqfqzmqwmojmcon_0', $programa->ID );
+            $programa->precio_nice = get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID ) != null ? number_format(intval( get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID ) ) ): 0;
+            //$programa->precio_nice = money_format('%.2n', intval( get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID ) ) );
+            $programa->image = get_the_post_thumbnail_url( $programa->ID );
+            $programa->permalink = get_permalink( $programa->ID );
+            $programa->aprioridad = get_field( '__pxid_gbjenfhyuqjvzbf_0', $programa->ID );
+            array_push($response["posts"], $programa);
         }
         
     }
@@ -574,13 +458,6 @@ function getProgramas( WP_REST_Request $request ){
     $response["found_posts"]=$programas->found_posts;
     $response["total_pagination"]= ceil($programas->found_posts/$posts_per_page);
     $response["total_posts"]=count($programas->posts);
-    $response["request"] = $body;
-    $response["args"] = $args;
-
-    if(isset($universidad)){
-      $response["universidad"] = $universidad;
-    }
-  
     return $response;
     // return get_terms('programas-categories',[
     //     "parent"=>0
@@ -589,7 +466,7 @@ function getProgramas( WP_REST_Request $request ){
 
 add_action( 'rest_api_init', function () {
     register_rest_route( 'devtzal/v1', '/programas/all', array(
-      'methods' => 'GET',
+      'methods' => 'POST',
       'callback' => 'getProgramas',
       'args' => [
         'posts_per_page' => [
@@ -607,114 +484,11 @@ add_action( 'rest_api_init', function () {
   } 
 );
 
-function getProgramTypes(WP_REST_Request $request){
-  $response = [];
-    $terms = get_field('tipo_de_programa');
-    foreach($terms as $term){
-        array_push( $response, $term) ;
-    }
-    
-    return $response;
-}
-
-
-
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'devtzal/v1', '/types', array(
-    'methods' => 'GET',
-    'callback' => 'getProgramTypes',
-    'args' => [
-      'post_id' => [
-          'validate_callback' => function($param, $request, $key) {
-              return is_numeric( $param );
-            }
-          ],
-    ],
-  ) );
-} 
-);
-function getUniversities(WP_REST_Request $request){
-
-  $disciplina = $request->get_param('disciplina');
-  $response = [];
-  $field = get_field_object('field_603596409e1fa');
-  //var_dump($field);
-  $terms = $field['choices'];
- 
-
-  //$validUniversities = ['National College of Ireland','Dundalk Institute of Technology','University College of Cork','University of Limerick','Griffith College','IBAT College','ELI Schools', 'Dorset College'];
- // $disabledUniversities = ['Dundalk Institute of Technology','University College of Cork','University of Limerick','Griffith College','IBAT College','ELI Schools'];
-  
-  foreach($terms as $term){
-    // if(in_array($term, $validUniversities)){
-
-      // if($disciplina){
-        $args = array(
-          'post_type' => 'programs',
-          'posts_per_page' => 1, // only need 1, just checking for any posts with the value
-          'meta_query' => array(
-
-            array(
-              'key' => 'universidad',
-              'value' => $term,
-              'compare' => 'LIKE',
-            ),
-            ),
-            'post_status'=>'publish',
-            'suppress_filters' => false
-
-          );
-          
-          // array_push($args['tax_query'],[
-          //   'taxonomy' => 'category',
-          //   'field' => 'term_id',
-          //   'terms' => $disciplina,
-          // ]);
-          
-          $query = new WP_Query($args);
-          //var_dump($query);
-          if(count($query->posts)){
-            array_push( $response, $term) ;
-          }
-      // }else{
-      //   array_push( $response, $term) ;
-      // }
-        
-      
-    // }
-     
-  }
-  
-  // $response['args'] = $args;
-  // $response['terms'] = $field;
-  return $response;
-}
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'devtzal/v1', '/universities', array(
-    'methods' => 'GET',
-    'callback' => 'getUniversities',
-    'args' => [
-      'post_id' => [
-          'validate_callback' => function($param, $request, $key) {
-              return is_numeric( $param );
-            }
-          ],
-    ],
-  ) );
-} 
-);
-
 function getDisciplinas( WP_REST_Request $request ){
-    /* global $sitepress;
-    $original_lang = ICL_LANGUAGE_CODE; // Save the current language
-    $lang = $request['lang']; // The language in which you want to get the terms
-    $sitepress->switch_lang($new_lang); // Switch to new language
-   */
-  //dd($original_lan)
     $all = $request->get_param( 'all' );
     if(!$all){
       $terms = get_terms(
-        'category',
+        'programas-categories',
         [
           "parent"=>0,
           "hide_empty"  =>  true
@@ -722,7 +496,7 @@ function getDisciplinas( WP_REST_Request $request ){
       );
     }else{
       $terms = get_terms(
-        'category',
+        'programas-categories',
         [ "hide_empty"  =>  true ]
       );
     }
@@ -751,7 +525,7 @@ add_action( 'rest_api_init', function () {
 function getSubdisciplinas( WP_REST_Request $request ){
     $response = [];
     $terms = get_terms(
-      'category',
+      'programas-categories',
       [
         "parent"=>$request->get_param( 'id' ),
         "hide_empty"  =>  true
@@ -787,7 +561,6 @@ add_action( 'rest_api_init', function () {
 
 function getDisciplinasbyQuery(WP_REST_Request $request){
 
-   
     //$query = $request->get_param( 'query' );
     $body = $request->get_json_params();
     $query = $body["query"];
@@ -801,7 +574,7 @@ function getDisciplinasbyQuery(WP_REST_Request $request){
 
 
     $args = [
-      'post_type' => 'programs',
+      'post_type' => 'programas',
       'orderby'   => 'post_title',
       'order' => 'ASC',
       'posts_per_page'=>$posts_per_page,
@@ -814,7 +587,7 @@ function getDisciplinasbyQuery(WP_REST_Request $request){
     
     if( $query ){
       array_push($args['tax_query'],[
-        'taxonomy'         => 'category',
+        'taxonomy'         => 'programas-categories',
         'terms'            => $query,
       ]);
     }
@@ -827,11 +600,11 @@ function getDisciplinasbyQuery(WP_REST_Request $request){
 
     foreach ( $programas->posts as $programa ) {
         if($programa->post_status=='publish'){
-            $programa->duracion = get_field( 'duracion', $programa->ID );
-            $programa->locacion=  get_field( 'pais', $programa->ID );
-            $programa->universidad = get_field( 'universidad', $programa->ID );
-            $programa->tipoStudio = get_field( 'tipo_de_programa', $programa->ID );
-            $programa->precio = get_field( 'precio', $programa->ID );
+            $programa->duracion = get_field( 'duraci_n__pxid_ikccbauokuraaqn_1', $programa->ID );
+            $programa->locacion=  get_field( 'locaci_n__pxid_vmhpboqdvmytbzn_0', $programa->ID );
+            $programa->universidad = get_field( 'campus__pxid_durqhfzxqpupgom_0', $programa->ID );
+            $programa->tipoStudio = get_field( 'nivel__pxid_dodgcgpusgnbpny_2', $programa->ID );
+            $programa->precio = get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $programa->ID );
             $programa->image = get_the_post_thumbnail_url( $programa->ID );
             $programa->permalink = get_permalink( $programa->ID );
             array_push($response["posts"], $programa);
@@ -868,11 +641,11 @@ function getMetaData( WP_REST_Request $request ){
     $post_id = $request->get_param( 'post_id' );
     $response=[];
     
-    $response['duracion'] = get_field( 'duracion', $post_id );
-    $response['locacion'] =  get_field( 'pais', $post_id );
-    $response['universidad'] = get_field( 'universidad', $post_id );
-    $response['tipoStudio'] = get_field( 'tipo_de_programa', $post_id );
-    $response['precio'] = get_field( 'precio', $post_id );
+    $response['duracion'] = get_field( 'duraci_n__pxid_ikccbauokuraaqn_1', $post_id );
+    $response['locacion'] =  get_field( 'locaci_n__pxid_vmhpboqdvmytbzn_0', $post_id );
+    $response['universidad'] = get_field( 'campus__pxid_durqhfzxqpupgom_0', $post_id );
+    $response['tipoStudio'] = get_field( 'nivel__pxid_dodgcgpusgnbpny_2', $post_id );
+    $response['precio'] = get_field( 'precio__pxid_fjnxizeqqcolvjx_0', $post_id );
     
     return $response;
 }
