@@ -11,12 +11,13 @@ var START_FETCH=false;
 var PRICE_CHANGED=false;
 var aborter = null;
 var ALL_DISCIPLINAS=[];
-let PAIS,DISCIPLINA_ID=null;
+let PAIS,DISCIPLINA_ID,LANG=null;
 let UNIVERSIDADES=[];
 
 jQuery( document ).ready(function() {
     jQuery('#select-subdisciplina+.select2-container').hide();
     PAIS=jQuery('#pais').val().length > 0 ? jQuery('#pais').val() : null;
+    LANG = jQuery('#lang').val() != null ? jQuery('#lang').val() : 'en';
     if(PAIS){
         jQuery('#paise-container').hide();
     }else{
@@ -26,7 +27,9 @@ jQuery( document ).ready(function() {
         });
     }
     DISCIPLINA_ID=jQuery('#disciplina_id').val();
+    console.log(DISCIPLINA_ID);
     TIPO_ESTUDIOS.forEach(tipoEstudio=>{
+
         let optionHtml=`<option value="${tipoEstudio.value}">${tipoEstudio.name}</span></option>`
         jQuery('#select-tipo-studios').append(optionHtml);
     });
@@ -233,7 +236,8 @@ jQuery(document).on('change', '#select-disciplinas', async function(){
         if( this.value !=0 ){
             jQuery('#nice-tipo-subdisciplina').text( jQuery("#select-disciplinas option:selected" ).text() );
             jQuery('#loader-subdisciplina, .hr').show(800);
-            const response = await fetch(`/wp-json/devtzal/v1/subdisciplinas?id=${this.value}`);
+            const response = await fetch(`/wp-json/devtzal/v1/subdisciplinas?id=${this.value}&lang=${LANG
+            }`);
             const data = await response.json();
             
             jQuery('#select-subdisciplina').empty().append('<option value="0"><span id="nice-universidad">Subdisciplines...</span></option>');
@@ -274,7 +278,7 @@ var substringMatcher = function(strs) {
 
 const getInputsData=()=>{
     const tipoEstudio = jQuery('#select-tipo-studios option:selected').val() == 0 ? null : jQuery('#select-tipo-studios option:selected').val();
-    const disciplina = jQuery('#select-disciplinas option:selected').val() == 0 ? null : jQuery('#select-disciplinas option:selected').val();
+    const disciplina = jQuery('#select-disciplinas option:selected').val() == 0 ? jQuery('#disciplina_id').val() : jQuery('#select-disciplinas option:selected').val();
     const subdisciplina = jQuery('#select-subdisciplina option:selected').val() == 0 ? null : jQuery('#select-subdisciplina option:selected').val();
     const universidad = jQuery('#select-universidad option:selected').val() == 0 ? null : jQuery('#select-universidad option:selected').text();
     const pais = PAIS ? PAIS : jQuery('#select-pais option:selected').val() == 0 ? null : jQuery('#select-pais option:selected').val();
@@ -295,6 +299,8 @@ const getInputsData=()=>{
         queryData.minPrice=minPrice;
         queryData.maxPrice=maxPrice;
     }
+    console.log("QueryData");
+    console.log(queryData);
     return queryData;
 }
 const initPostPropgramas=async ( fromText=false )=>{
@@ -358,30 +364,43 @@ const getProgramas = async (fromText=false)=>{
         // make our request cancellable
         aborter = new AbortController();
         const signal = aborter.signal;
-        const bodyInputs = JSON.stringify( getInputsData() )
-        
-        const bodyFromText = JSON.stringify({
-            disciplina: jQuery('#search-by-disciplina').val(),
+        const bodyInputs = getInputsData();
+
+        var disciplinaV = jQuery('#search-by-disciplina').val() != null ? jQuery('#search-by-disciplina').val():jQuery('#disciplina_id').val();
+        const bodyFromText = {
+            disciplina: disciplinaV,
             universidad:jQuery('#search-by-location').val(),
+            lang: LANG,
             pais:jQuery('#search-by-location').val(),
             fromText:1,
             pagination_number:jQuery('#input-pagination_number').val(),
             posts_per_page:POST_PER_PAGE,
-        })
+        };
 
-        const response = await fetch('/wp-json/devtzal/v1/programas/all',{
-                method: 'POST',
-                signal:signal,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                  },
-                body: fromText ? bodyFromText : bodyInputs
-            }
-        );
-        console.log(bodyFromText);
+        //console.log("Antes del request:");
+       
+        var response = null;
+      
+        if(fromText)
+        {
+            response = await fetch(`/wp-json/devtzal/v1/programas/all?posts_per_page=${bodyFromText.posts_per_page}&pagination_number=${bodyFromText.pagination_number}&disciplina=${bodyFromText.disciplina}&universidad=${bodyFromText.universidad}&lang=${LANG}`);
+        }else{
+            response = await fetch(`/wp-json/devtzal/v1/programas/all?posts_per_page=${bodyInputs.posts_per_page}&pagination_number=${bodyInputs.pagination_number}&disciplina=${bodyInputs.disciplina}${bodyInputs.universidad != null ? '&universidad=' + bodyInputs.universidad : ''}${bodyInputs.minPrice != null ? '&minPrice=' + bodyInputs.minPrice : ''}${bodyInputs.maxPrice != null ? '&maxPrice=' + bodyInputs.maxPrice : ''}&subdisciplina=${bodyInputs.subdisciplina}&lang=${LANG}`);
+        }
+        //console.log(response);
+        // const response = await fetch('/wp-json/devtzal/v1/programas/all',{
+        //         method: 'POST',
+        //         signal:signal,
+        //         headers: {
+        //             'Accept': 'application/json',
+        //             'Content-Type': 'application/json'
+        //           },
+        //         body: fromText ? bodyFromText : bodyInputs
+        //     }
+        // );
+       // console.log("Data Programas:");
         const dataProgramas= await response.json();
-        console.log(dataProgramas);
+        //console.log(response);
         jQuery('#total-paginations').text(dataProgramas.total_pagination);
         aborter = null;
         handlePaginationButtons(dataProgramas.total_pagination);
@@ -403,8 +422,10 @@ const handlePaginationButtons=(total_pagination)=>{
     }
 }
 const getDisciplinas = async ()=>{
-    const response = await fetch('/wp-json/devtzal/v1/disciplinas');
+    const response = await fetch('/wp-json/devtzal/v1/disciplinas?lang='+LANG);
     const dataDisciplinas= await response.json();
+    console.log("Disciplinas:");
+    console.log(dataDisciplinas);
     return dataDisciplinas;
 };
 const setAllDisciplinas = async ()=>{
@@ -421,14 +442,14 @@ const getProgramTypes = async ()=>{
 
 const getUniversities = async ()=>{
     
-    let disciplina = jQuery('#select-disciplinas option:selected').val() == 0 ? null : jQuery('#select-disciplinas option:selected').val();
+    //let disciplina = jQuery('#select-disciplinas option:selected').val() == 0 ? null : jQuery('#select-disciplinas option:selected').val();
     
-    let response;
-    if(disciplina != null){
-         response = await fetch('/wp-json/devtzal/v1/universities?disciplina='+disciplina);
-    }else{
-        response = await fetch('/wp-json/devtzal/v1/universities?disciplina');
-    }
+    //  response = null;
+    // if(disciplina != null){
+        var  response = await fetch(`/wp-json/devtzal/v1/universities?lang=${LANG}`);
+    // }else{
+    //     response = await fetch('/wp-json/devtzal/v1/universities?disciplina');
+    // }
 
     let dataUniversities= await response.json();
     UNIVERSIDADES = dataUniversities;

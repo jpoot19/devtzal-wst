@@ -5,7 +5,8 @@ Plugin URI: https://devtzal.com/
 Description: Plugin .
 Version: 1.0
 Author: Jose Briceño
-
+Text Domain: devtzal-wst
+Domain Path: /assets/languages
 */
 
 if ( !function_exists('add_action') ){
@@ -42,7 +43,9 @@ function init_admin_content(){
 function content_por_pais( $atts ){
     $pais =  $atts['pais'];
     $disciplina_id =  $atts['disciplina_id'];
-    
+    $lang = $atts['lang'];
+    //$sitelang = $sitepress->get_current_language();
+    //$sitepress->switch_lang($lang);
     devtzal_enqueue_script();
     wp_register_script('main_pais', plugins_url('/assets/main_pais.js?time='.rand(),__FILE__ ), [], '', true);
     wp_enqueue_script('main_pais');
@@ -56,15 +59,16 @@ function content_por_pais( $atts ){
             <div class="col-12 col-sm-3">
               <div class="row">
                 <button type="button" id="nice-busqueda" class="btn btn-outline-primary text-left mb-3 col-12 toggle-filters">
-                  Search.
+                  Search
                   <img src="'.plugins_url('/assets/arrow-down-sign-to-navigate.png',__FILE__).'" width="1em" class="d-sm-none"/>
                 </button>
+               
               </div>
               <div class="row" id="filters-container">        
                 <div class="position-fixed_ col-12">
                     <button type="button" id="deleted-filters" class="btn btn-primary">Clean Filters</button>
                     <div class = "mt-3">
-                      <span id="nice-tipo-estudios">Program Types</span>
+                      <span id="nice-tipo-estudios">'.esc_html( __( 'Program Types', 'devtzal-wst' ) ).'</span>
                       <select class="form-select" id="select-tipo-studios">
                         <option value="0"><span id="nice-tipo-estudios">Program Types...</span></option>
                       </select>
@@ -72,10 +76,10 @@ function content_por_pais( $atts ){
                   
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-tipo-disciplinas">Disciplines</span>
+                      <span id="nice-tipo-disciplinas">'.esc_html( __( 'Disciplines', 'devtzal-wst' ) ).'</span>
                       <div class="spinner-border spinner-border-sm" id="loader-disciplinas" role="status"></div>
                       <select class="form-select" id="select-disciplinas" style="display:none;">
-                        <option value="0" ><span id="nice-disciplinas">Disciplines...</span></option>
+                        <option value="0" ><span id="nice-disciplinas">'.esc_html( __( 'Disciplines ...', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div>
                     
@@ -89,22 +93,22 @@ function content_por_pais( $atts ){
                     </div>
                     <div id="paise-container">
                       <hr class="my-4"/>
-                      <span id="nice-pais">País</span>
+                      <span id="nice-pais">'.esc_html( __( 'Country', 'devtzal-wst' ) ).'</span>
                       <select class="form-select" id="select-pais">
-                        <option value="0"><span id="nice-pais">Country...</span></option>
+                        <option value="0"><span id="nice-pais">'.esc_html( __( 'Countries ...', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div>
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-universidad">University</span>
+                      <span id="nice-universidad">'.esc_html( __( 'University', 'devtzal-wst' ) ).'</span>
                       <select class="form-select" id="select-universidad">
-                        <option value="0"><span id="nice-universidad">University...</span></option>
+                        <option value="0"><span id="nice-universidad">'.esc_html( __( 'University ...', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div>
 
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-precio">Price</span>
+                      <span id="nice-precio">'.esc_html( __( 'Price', 'devtzal-wst' ) ).'</span>
                       <div class="row">
                         <div class="col-6 d-flex">
                           <label for="formFile" class="price-input-lable">$</label>
@@ -140,6 +144,7 @@ function content_por_pais( $atts ){
                       <input type="hidden" id="input-pagination_number" value="1"/>
                       <input type="hidden" id="pais" value="'.$pais.'"/>
                       <input type="hidden" id="disciplina_id" value="'.$disciplina_id.'"/>
+                      <input type="hidden" id="lang" value="'.$lang.'"/>
                     </div> 
                 </div>
               </div>
@@ -175,14 +180,14 @@ function content(){
             <div class="row justify-content-end">
               <div class="col-12 col-sm-6 position-relative">
                 
-                <div id="nice-que-estudias" class="text-center_"><b>¿Qué deseas estudiar?</b></div>
-                <input type="text" class="price-input" id="search-by-disciplina" placeholder="Administración de Empresas...">
+                <div id="nice-que-estudias" class="text-center_"><b>'.esc_html( __( 'What do you want to study?', 'devtzal-wst' ) ).'</b></div>
+                <input type="text" class="price-input" id="search-by-disciplina" placeholder="'.esc_html( __( 'Business Administration', 'devtzal-wst' ) ).'">
                 
                 <div class="spinner-border spinner-border-sm" id="loader-disciplinas-text" role="status"></div>
               </div>
               <div class="col-12 col-sm-6">
-                <div id="nice-donde-estudias" class="text-center_"><b>¿Dónde deseas estudiar?</b></div>
-                <input type="text" class="price-input" id="search-by-location" placeholder="Irlanda...">
+                <div id="nice-donde-estudias" class="text-center_"><b>'.esc_html( __( 'Where do you want to study?', 'devtzal-wst' ) ).'</b></div>
+                <input type="text" class="price-input" id="search-by-location" placeholder="'.esc_html( __( 'Irland ...', 'devtzal-wst' ) ).'">
               </div>
             </div>
           </div>
@@ -191,26 +196,26 @@ function content(){
             <div class="col-12 col-sm-3">
               <div class="row">
                 <button type="button" id="nice-busqueda" class="btn btn-outline-primary text-left mb-3 col-12 toggle-filters">
-                  Búsqueda
+                '.esc_html( __( 'Search', 'devtzal-wst' ) ).'
                   <img src="'.plugins_url('/assets/arrow-down-sign-to-navigate.png',__FILE__).'" width="1em" class="d-sm-none"/>
                 </button>
               </div>
               <div class="row" id="filters-container">
                 <div class="position-fixed_ col-12">
-                    <button type="button" id="deleted-filters" class="btn btn-primary">Limpiar Filtros</button>
+                    <button type="button" id="deleted-filters" class="btn btn-primary">'.esc_html( __( 'Clean Filters', 'devtzal-wst' ) ).'</button>
                     <div>
-                      <span id="nice-tipo-estudios">Tipo de estudios</span>
+                      <span id="nice-tipo-estudios">'.esc_html( __( 'Program Types', 'devtzal-wst' ) ).'</span>
                       <select class="form-select" id="select-tipo-studios">
-                        <option value="0"><span id="nice-tipo-estudios">Tipo de estudios...</span></option>
+                        <option value="0"><span id="nice-tipo-estudios">'.esc_html( __( 'Program Types...', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div>
                     
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-tipo-disciplinas">Disciplinas</span>
+                      <span id="nice-tipo-disciplinas">'.esc_html( __( 'Disciplines', 'devtzal-wst' ) ).'</span>
                       <div class="spinner-border spinner-border-sm" id="loader-disciplinas" role="status"></div>
                       <select class="form-select" id="select-disciplinas" style="display:none;">
-                        <option value="0" ><span id="nice-disciplinas">Disciplinas...</span></option>
+                        <option value="0" ><span id="nice-disciplinas">'.esc_html( __( 'Disciplines ...', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div>
                     
@@ -225,29 +230,29 @@ function content(){
 
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-pais">País</span>
+                      <span id="nice-pais">'.esc_html( __( 'Country', 'devtzal-wst' ) ).'</span>
                       <select class="form-select" id="select-pais">
-                        <option value="0"><span id="nice-pais">País...</span></option>
+                        <option value="0"><span id="nice-pais">'.esc_html( __( 'Countries ...', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div>
 
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-universidad">Universidad</span>
+                      <span id="nice-universidad">'.esc_html( __( 'University', 'devtzal-wst' ) ).'</span>
                       <select class="form-select" id="select-universidad">
-                        <option value="0"><span id="nice-universidad">Universidad...</span></option>
+                        <option value="0"><span id="nice-universidad">'.esc_html( __( 'Universities', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div>
                     <!-- <div>
                       <hr class="my-4"/>
                       <span id="nice-universidad2">Universidad</span>
                       <select class="form-select" id="select-universidad2">
-                        <option value="0"><span id="nice-universidad2">Universidad...</span></option>
+                        <option value="0"><span id="nice-universidad2">'.esc_html( __( 'University ...', 'devtzal-wst' ) ).'</span></option>
                       </select>
                     </div> -->
                     <div>
                       <hr class="my-4"/>
-                      <span id="nice-precio">Precio</span>
+                      <span id="nice-precio">'.esc_html( __( 'Price', 'devtzal-wst' ) ).'</span>
                       <div class="row">
                         <div class="col-6 d-flex">
                           <label for="formFile" class="price-input-lable">$</label>
@@ -324,7 +329,7 @@ add_action( 'rest_api_init', function () {
   } );
 
 function getProgramas( WP_REST_Request $request ){
-    $body = $request->get_json_params();
+    $body = $request->get_params();
     //dd($request);
     $posts_per_page = $body["posts_per_page"];
     $pagination_number = $body["pagination_number"];
@@ -335,10 +340,12 @@ function getProgramas( WP_REST_Request $request ){
     $minPrice = $body["minPrice"]; //meta data
     $maxPrice = $body["maxPrice"]; //meta data
     $tipoEstudio = $body["tipoEstudio"]; //meta data
-    
+    //$lang = $body["lang"];
+
     $fromText = $body["fromText"]; //meta data
     
-    
+    // global $sitepress;
+    // $sitepress->switch_lang($lang);
    
    
     $args = [
@@ -350,7 +357,11 @@ function getProgramas( WP_REST_Request $request ){
       'tax_query'=>[],
       'meta_query'=>[],
       'post_status'=>'publish',
-      // 'suppress_filters' => false
+      'suppress_filters' => false,
+      // 'lang' => $lang
+      
+      //'category' => icl_object_id($disciplina, 'category', true, 'es'),
+      
     ];
 
 /*     array_push($args['meta_query'],[
@@ -447,7 +458,7 @@ function getProgramas( WP_REST_Request $request ){
         'compare' => 'LIKE',
       ]);
     }
-    if($universidad){
+    if(isset($universidad)){
       array_push($args['meta_query'],[
         'key' => 'universidad',
         'value' => $universidad,
@@ -464,31 +475,31 @@ function getProgramas( WP_REST_Request $request ){
     }
     if($fromText){
 
-      $args2=[
-        'post_type' => 'programs',
-        'orderby'   => 'menu_order',
-        'order' => 'DESC',
-        'posts_per_page'=>$posts_per_page,
-        'offset'=> ($pagination_number - 1) * $posts_per_page,
-        'tax_query'=>[],
-        'meta_query'=>[],
-      ];
+        $args2=[
+          'post_type' => 'programs',
+          'orderby'   => 'menu_order',
+          'order' => 'DESC',
+          'posts_per_page'=>$posts_per_page,
+          'offset'=> ($pagination_number - 1) * $posts_per_page,
+          'tax_query'=>[],
+          'meta_query'=>[],
+          'suppress_filters' => false,
+        ];
 
-      if($disciplina){
-        array_push($args2['tax_query'],[
-              'taxonomy'  => 'category',
-              'field' => 'term_id
-              ',
-              'terms' => $disciplina,
-        ]);
-      }
-      if($universidad && $pais ){
-        array_push($args2['meta_query'],[
-          'relation' => 'OR',
-          ['key' => 'universidad', 'value' => $universidad],
-          ['key' => 'pais', 'value' => $pais]
-        ]);
-      }
+        if($disciplina){
+          array_push($args2['tax_query'],[
+                'taxonomy'  => 'category',
+                'field' => 'term_id',
+                'terms' => $disciplina,
+          ]);
+        }
+        if($universidad && $pais ){
+          array_push($args2['meta_query'],[
+            'relation' => 'OR',
+            ['key' => 'universidad', 'value' => $universidad],
+            ['key' => 'pais', 'value' => $pais]
+          ]);
+        }
       
       $programas = new WP_Query( $args2 );
 
@@ -537,7 +548,7 @@ function getProgramas( WP_REST_Request $request ){
               $programa->permalink = get_permalink( $programa->ID );
               $programa->category = get_field('category', $programa->ID );
               $programa->aprioridad = get_field( '__pxid_gbjenfhyuqjvzbf_0', $programa->ID );
-              //$programa->disciplina =   //$disciplina;
+              //$programa->disciplina =   $disciplina;
              
          
               array_push($response["posts"], $programa);
@@ -559,6 +570,13 @@ function getProgramas( WP_REST_Request $request ){
     $response["found_posts"]=$programas->found_posts;
     $response["total_pagination"]= ceil($programas->found_posts/$posts_per_page);
     $response["total_posts"]=count($programas->posts);
+    $response["request"] = $body;
+    $response["args"] = $args;
+
+    if(isset($universidad)){
+      $response["universidad"] = $universidad;
+    }
+  
     return $response;
     // return get_terms('programas-categories',[
     //     "parent"=>0
@@ -567,7 +585,7 @@ function getProgramas( WP_REST_Request $request ){
 
 add_action( 'rest_api_init', function () {
     register_rest_route( 'devtzal/v1', '/programas/all', array(
-      'methods' => 'POST',
+      'methods' => 'GET',
       'callback' => 'getProgramas',
       'args' => [
         'posts_per_page' => [
@@ -613,19 +631,20 @@ add_action( 'rest_api_init', function () {
 );
 function getUniversities(WP_REST_Request $request){
 
-  $disciplina = $request->get_param('disciplina' );
+  $disciplina = $request->get_param('disciplina');
   $response = [];
   $field = get_field_object('field_603596409e1fa');
   //var_dump($field);
   $terms = $field['choices'];
+ 
 
-  $validUniversities = ['Dundalk Institute of Technology','University College of Cork','University of Limerick','Griffith College','IBAT College','ELI Schools'];
+  //$validUniversities = ['National College of Ireland','Dundalk Institute of Technology','University College of Cork','University of Limerick','Griffith College','IBAT College','ELI Schools', 'Dorset College'];
+ // $disabledUniversities = ['Dundalk Institute of Technology','University College of Cork','University of Limerick','Griffith College','IBAT College','ELI Schools'];
   
-
   foreach($terms as $term){
-    if(in_array($term, $validUniversities)){
+    // if(in_array($term, $validUniversities)){
 
-      if($disciplina){
+      // if($disciplina){
         $args = array(
           'post_type' => 'programs',
           'posts_per_page' => 1, // only need 1, just checking for any posts with the value
@@ -642,26 +661,28 @@ function getUniversities(WP_REST_Request $request){
 
           );
           
-          array_push($args['tax_query'],[
-            'taxonomy' => 'category',
-            'field' => 'term_id',
-            'terms' => $disciplina,
-          ]);
+          // array_push($args['tax_query'],[
+          //   'taxonomy' => 'category',
+          //   'field' => 'term_id',
+          //   'terms' => $disciplina,
+          // ]);
           
           $query = new WP_Query($args);
-          var_dump($query);
+          //var_dump($query);
           if(count($query->posts)){
             array_push( $response, $term) ;
           }
-      }else{
-        array_push( $response, $term) ;
-      }
+      // }else{
+      //   array_push( $response, $term) ;
+      // }
         
       
-    }
+    // }
      
   }
   
+  // $response['args'] = $args;
+  // $response['terms'] = $field;
   return $response;
 }
 add_action( 'rest_api_init', function () {
@@ -680,10 +701,11 @@ add_action( 'rest_api_init', function () {
 );
 
 function getDisciplinas( WP_REST_Request $request ){
-  global $sitepress;
-  $original_lang = ICL_LANGUAGE_CODE; // Save the current language
-  //$new_lang = 'es'; // The language in which you want to get the terms
-  $sitepress->switch_lang($original_lang); // Switch to new language
+    /* global $sitepress;
+    $original_lang = ICL_LANGUAGE_CODE; // Save the current language
+    $lang = $request['lang']; // The language in which you want to get the terms
+    $sitepress->switch_lang($new_lang); // Switch to new language
+   */
   //dd($original_lan)
     $all = $request->get_param( 'all' );
     if(!$all){
@@ -761,10 +783,7 @@ add_action( 'rest_api_init', function () {
 
 function getDisciplinasbyQuery(WP_REST_Request $request){
 
-  global $sitepress;
-  $original_lang = ICL_LANGUAGE_CODE; // Save the current language
-  //$new_lang = 'es'; // The language in which you want to get the terms
-  $sitepress->switch_lang($original_lang); 
+   
     //$query = $request->get_param( 'query' );
     $body = $request->get_json_params();
     $query = $body["query"];
